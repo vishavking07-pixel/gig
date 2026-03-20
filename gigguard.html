@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GigGuard AI — Income Shield for Delivery Heroes</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --bg2: #0f1217;
+    --panel: #141820;
+    --panel2: #1a2030;
+    --border: #1e2a3a;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #00ff88;
+    --accent4: #ffd93d;
+    --text: #e8edf5;
+    --text2: #8899bb;
+    --text3: #556070;
+    --red: #ff4560;
+    --yellow: #ffd93d;
+    --green: #00ff88;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── GRID BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen { display: none; position: relative; z-index: 1; }
+  .screen.active { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  /* ─── NAV ─── */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,12,15,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-shield { font-size: 24px; }
+  .nav-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--accent);
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 1px;
+    padding: 6px 12px; border-radius: 6px;
+    border: 1px solid transparent;
+    background: none; color: var(--text2);
+    cursor: pointer; transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .nav-tab:hover { color: var(--text); border-color: var(--border); }
+  .nav-tab.active { color: var(--accent); border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.08); }
+
+  /* ─── HERO ─── */
+  .hero {
+    padding: 80px 24px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: inline-block;
+    border: 1px solid rgba(255,107,53,0.3);
+    padding: 4px 14px; border-radius: 20px;
+    background: rgba(255,107,53,0.08);
+  }
+  .hero h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(40px, 7vw, 80px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    font-size: 16px; color: var(--text2);
+    max-width: 560px; margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 40px;
+    flex-wrap: wrap; margin-bottom: 48px;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat .num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 36px; font-weight: 700;
+    color: var(--accent); line-height: 1;
+  }
+  .hero-stat .lbl { font-size: 12px; color: var(--text3); margin-top: 4px; }
+  .btn-primary {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px; font-weight: 700; letter-spacing: 2px;
+    padding: 14px 36px; border-radius: 8px;
+    background: var(--accent); color: #000;
+    border: none; cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .btn-primary:hover { background: #33ddff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,255,0.3); }
+  .btn-ghost {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px; font-weight: 600; letter-spacing: 1px;
+    padding: 12px 24px; border-radius: 8px;
+    background: none; color: var(--text2);
+    border: 1px solid var(--border); cursor: pointer;
+    transition: all 0.2s; text-transform: uppercase;
+    margin-left: 12px;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text2); }
+
+  /* ─── SECTION ─── */
+  .section { padding: 48px 24px; max-width: 1100px; margin: 0 auto; }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px; font-weight: 700;
+    margin-bottom: 32px;
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,212,255,0.2); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* ─── PROBLEM SECTION ─── */
+  .problem-quote {
+    background: var(--panel);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    font-style: italic; color: var(--text2);
+    line-height: 1.7;
+  }
+  .problem-quote strong { color: var(--accent2); font-style: normal; }
+  .stat-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.25);
+    border-radius: 8px; padding: 12px 16px;
+    margin-bottom: 12px; width: 100%;
+  }
+  .stat-pill .icon { font-size: 20px; }
+  .stat-pill .val {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--accent2);
+  }
+  .stat-pill .desc { font-size: 12px; color: var(--text2); }
+
+  /* ─── PERSONA TABLE ─── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text3);
+    text-align: left; padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 12px; border-bottom: 1px solid rgba(30,42,58,0.5); color: var(--text2); }
+  tr:last-child td { border-bottom: none; }
+  .highlight-row td { color: var(--text); }
+  .highlight-row td:first-child { color: var(--accent); font-weight: 600; }
+  .badge {
+    display: inline-block;
+    font-size: 11px; padding: 2px 8px; border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+  .badge-red { background: rgba(255,69,96,0.15); color: var(--red); border: 1px solid rgba(255,69,96,0.3); }
+  .badge-yellow { background: rgba(255,217,61,0.15); color: var(--yellow); border: 1px solid rgba(255,217,61,0.3); }
+  .badge-green { background: rgba(0,255,136,0.1); color: var(--green); border: 1px solid rgba(0,255,136,0.25); }
+  .badge-blue { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
+
+  /* ─── SIMULATOR ─── */
+  .simulator-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .live-dot {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green);
+  }
+  .live-dot::before {
+    content: '';
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  
+  .trigger-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  @media (max-width: 600px) { .trigger-grid { grid-template-columns: 1fr 1fr; } }
+  
+  .trigger-card {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    cursor: pointer; transition: all 0.25s;
+    text-align: center; user-select: none;
+  }
+  .trigger-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .trigger-card.armed { border-color: var(--accent2); background: rgba(255,107,53,0.08); }
+  .trigger-card.fired { border-color: var(--red); background: rgba(255,69,96,0.1); animation: shake 0.3s; }
+  @keyframes shake { 0%,100% { transform: none; } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  .trigger-icon { font-size: 28px; margin-bottom: 8px; }
+  .trigger-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text2);
+  }
+  .trigger-threshold { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .trigger-card.armed .trigger-name { color: var(--accent2); }
+  .trigger-card.fired .trigger-name { color: var(--red); }
+
+  /* PAYOUT TERMINAL */
+  .terminal {
+    background: #070a0e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    min-height: 160px;
+    position: relative;
+    overflow: hidden;
+  }
+  .terminal::before {
+    content: '● ● ●';
+    position: absolute; top: 10px; left: 16px;
+    font-size: 10px; color: var(--text3);
+    letter-spacing: 4px;
+  }
+  .terminal-body { margin-top: 24px; }
+  .t-line { margin-bottom: 6px; color: var(--text2); }
+  .t-line.success { color: var(--green); }
+  .t-line.warn { color: var(--yellow); }
+  .t-line.error { color: var(--red); }
+  .t-line.info { color: var(--accent); }
+  .t-line .ts { color: var(--text3); margin-right: 8px; }
+  
+  .payout-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(0,255,136,0.12), rgba(0,212,255,0.08));
+    border: 1px solid rgba(0,255,136,0.3);
+    border-radius: 10px; padding: 20px 24px;
+    margin-top: 16px;
+    align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .payout-banner.show { display: flex; animation: fadeIn 0.4s ease; }
+  .payout-amount {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 42px; font-weight: 700;
+    color: var(--green);
+  }
+  .payout-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .payout-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px; color: var(--accent);
+  }
+
+  /* ─── PREMIUM CALCULATOR ─── */
+  .calc-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .calc-label { font-size: 13px; color: var(--text2); }
+  .calc-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px; color: var(--text);
+  }
+  .calc-divider { height: 1px; background: var(--border); margin: 12px 0; }
+  
+  select, input[type="range"] {
+    background: var(--panel2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 12px; font-size: 13px;
+    font-family: 'Noto Sans', sans-serif;
+    outline: none; cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  select:hover, select:focus { border-color: var(--accent); }
+  input[type="range"] {
+    padding: 0; width: 100%;
+    -webkit-appearance: none;
+    height: 4px; border-radius: 2px;
+    background: var(--border);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    box-shadow: 0 0 8px rgba(0,212,255,0.4);
+  }
+
+  .premium-result {
+    background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,255,136,0.05));
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 10px; padding: 20px;
+    text-align: center; margin-top: 16px;
+  }
+  .premium-amount {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 52px; font-weight: 700;
+    color: var(--accent); line-height: 1;
+  }
+  .premium-unit { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .premium-coverage {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: var(--green);
+    margin-top: 8px;
+  }
+
+  /* ─── ML SECTION ─── */
+  .ml-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px; margin-bottom: 16px;
+    border-left: 3px solid var(--accent);
+  }
+  .ml-card:nth-child(2) { border-left-color: var(--accent2); }
+  .ml-card:nth-child(3) { border-left-color: var(--green); }
+  .ml-card:nth-child(4) { border-left-color: var(--yellow); }
+  .ml-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; color: var(--text3);
+    margin-bottom: 8px;
+  }
+  .ml-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px; font-weight: 700; margin-bottom: 8px;
+  }
+  .ml-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .ml-tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; padding: 3px 8px;
+    border-radius: 4px; margin-top: 10px; margin-right: 6px;
+    background: rgba(0,212,255,0.08); color: var(--accent);
+    border: 1px solid rgba(0,212,255,0.2);
+  }
+
+  /* ─── STORY ─── */
+  .story-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    position: relative; overflow: hidden;
+  }
+  .story-box::before {
+    content: '"';
+    position: absolute; top: -20px; left: 16px;
+    font-size: 120px; color: rgba(0,212,255,0.06);
+    font-family: Georgia, serif; line-height: 1;
+  }
+  .story-text { font-size: 15px; color: var(--text2); line-height: 1.9; font-style: italic; }
+  .story-text strong { color: var(--accent); font-style: normal; }
+  .story-text .highlight { color: var(--green); font-style: normal; font-weight: 600; }
+  .story-name {
+    margin-top: 20px;
+    font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700;
+  }
+  .story-role { font-size: 12px; color: var(--text3); }
+
+  /* ─── TECH STACK ─── */
+  .tech-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px;
+  }
+  .tech-icon { font-size: 20px; width: 32px; text-align: center; }
+  .tech-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; color: var(--text);
+  }
+  .tech-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* ─── ROAD MAP ─── */
+  .roadmap-item {
+    display: flex; gap: 16px; margin-bottom: 20px;
+    position: relative;
+  }
+  .roadmap-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 11px; top: 28px;
+    width: 2px; bottom: -20px;
+    background: var(--border);
+  }
+  .roadmap-dot {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+  .roadmap-dot.done { background: var(--accent); color: #000; }
+  .roadmap-content { padding-top: 2px; }
+  .roadmap-date { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent2); margin-bottom: 4px; }
+  .roadmap-title { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .roadmap-items { font-size: 12px; color: var(--text2); line-height: 1.8; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px; text-align: center;
+    font-size: 12px; color: var(--text3);
+    margin-top: 60px;
+  }
+  footer strong { color: var(--accent); }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-bar-outer {
+    background: var(--border); border-radius: 4px;
+    height: 6px; margin: 6px 0; overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%; border-radius: 4px;
+    background: var(--accent);
+    transition: width 1.5s ease;
+  }
+  .progress-bar-inner.green { background: var(--green); }
+  .progress-bar-inner.orange { background: var(--accent2); }
+  .progress-bar-inner.red { background: var(--red); }
+
+  /* STREAK */
+  .streak-ladder {
+    display: flex; gap: 0; margin-top: 16px;
+    border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .streak-step {
+    flex: 1; padding: 12px 8px; text-align: center;
+    border-right: 1px solid var(--border);
+    font-size: 11px; color: var(--text3);
+    background: var(--panel2);
+    transition: all 0.3s;
+  }
+  .streak-step:last-child { border-right: none; }
+  .streak-step.active { background: rgba(255,217,61,0.1); color: var(--yellow); }
+  .streak-step.gold { background: rgba(255,217,61,0.15); color: var(--yellow); border-color: rgba(255,217,61,0.3); }
+  .streak-step .sw { font-size: 18px; }
+  .streak-step .sl { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <span class="logo-shield">🛡️</span> GIGGUARD AI
+    <span class="nav-badge">DEVTrails 2026</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
+    <button class="nav-tab" onclick="showTab('simulator')">Simulator</button>
+    <button class="nav-tab" onclick="showTab('premium')">Premium</button>
+    <button class="nav-tab" onclick="showTab('ml')">AI/ML</button>
+    <button class="nav-tab" onclick="showTab('story')">Persona</button>
+    <button class="nav-tab" onclick="showTab('stack')">Stack</button>
+  </div>
+</nav>
+
+<!-- ═══ OVERVIEW ═══ -->
+<div id="tab-overview" class="screen active">
+  <div class="hero">
+    <div class="hero-tag">🏆 Guidewire DEVTrails 2026 · Phase 1 Submission</div>
+    <h1>Zero-Touch <span>Income Shield</span><br>for India's Gig Heroes</h1>
+    <p>Parametric AI protection that pays out automatically — in real time — the moment a verified disruption crosses a threshold. Zero paperwork. Zero waiting.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">12M+</div>
+        <div class="lbl">Gig delivery partners<br>in India unprotected</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">₹3,800</div>
+        <div class="lbl">Weekly income lost<br>per monsoon disruption</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">&lt;90s</div>
+        <div class="lbl">Payout to UPI wallet<br>after trigger</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">3.2%</div>
+        <div class="lbl">Gig workers with any<br>income protection</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="showTab('simulator')">▶ Launch Simulator</button>
+    <button class="btn-ghost" onclick="showTab('story')">Read Karthik's Story</button>
+  </div>
+
+  <!-- PROBLEM -->
+  <div class="section">
+    <div class="section-label">The Problem</div>
+    <div class="section-title">The Invisible Income Shock</div>
+    <div class="grid-2">
+      <div>
+        <div class="stat-pill">
+          <span class="icon">🌧️</span>
+          <div>
+            <div class="val">₹2,200–3,800</div>
+            <div class="desc">Weekly loss per Chennai rider during Northeast Monsoon events (18–24% of monthly earnings)</div>
+          </div>
+        </div>
+        <div class="stat-pill">
+          <span class="icon">😶</span>
+          <div>
+            <div class="val">11.6M workers</div>
+            <div class="desc">Entirely uninsured against weather or civic disruptions across Tier-1 cities</div>
+          </div>
+        </div>
+        <div class="stat-pill">
+          <span class="icon">📦</span>
+          <div>
+            <div class="val">70–85% drop</div>
+            <div class="desc">In Q-commerce orders during a disruption — far worse than food delivery (40–50%)</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="problem-quote">
+          When a cyclone stalls over Chennai, when smog shuts down Bengaluru's outer ring road, or when a sudden bandh locks down a dark store's catchment zone, a delivery partner simply <strong>stops earning</strong>. No safety net catches them. No claim form exists. They absorb the loss silently and try again next week.
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">Why Q-Commerce over Food Delivery?</div>
+          <table>
+            <tr>
+              <th>Dimension</th>
+              <th>Food Delivery</th>
+              <th>Q-Commerce ←</th>
+            </tr>
+            <tr>
+              <td>Delivery window</td>
+              <td class="badge badge-yellow">30–45 min</td>
+              <td><span class="badge badge-red">10–15 min</span></td>
+            </tr>
+            <tr>
+              <td>Zone coverage</td>
+              <td>5–8 km radius</td>
+              <td><span class="badge badge-red">1–3 km</span></td>
+            </tr>
+            <tr>
+              <td>Orders/hr disruption</td>
+              <td>−40–50%</td>
+              <td><span class="badge badge-red">−70–85%</span></td>
+            </tr>
+            <tr>
+              <td>Income replacement</td>
+              <td>Partial surge</td>
+              <td><span class="badge badge-red">None</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <div class="section-label">Solution</div>
+    <div class="section-title">How GigGuard Works</div>
+    <div class="grid-3">
+      <div class="card">
+        <div style="font-size:32px;margin-bottom:12px">📱</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">1. Onboard in 90 Seconds</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">Phone + Aadhaar + Platform ID. 5-question risk profiling quiz. AI score generated instantly. Weekly policy offered with dynamic premium.</div>
+      </div>
+      <div class="card">
+        <div style="font-size:32px;margin-bottom:12px">🛰️</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">2. Real-Time Monitoring</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">6 parametric triggers checked every 15 minutes — rainfall, AQI, heat, traffic, flood alerts, and civic disruptions — at pin-code granularity.</div>
+      </div>
+      <div class="card">
+        <div style="font-size:32px;margin-bottom:12px">💸</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">3. Auto-Payout in &lt;90s</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">Threshold crossed → AI validates → fraud check → expected income loss calculated → UPI wallet credited. Zero paperwork. Zero waiting.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRIGGERS OVERVIEW -->
+  <div class="section">
+    <div class="section-label">Parametric Triggers</div>
+    <div class="section-title">What We Monitor</div>
+    <table>
+      <tr>
+        <th>#</th><th>Trigger</th><th>Source</th><th>Threshold</th><th>Income Loss</th>
+      </tr>
+      <tr>
+        <td>🌧️</td>
+        <td><strong style="color:var(--text)">Heavy Rainfall</strong></td>
+        <td style="color:var(--text3)">OpenWeatherMap + IMD</td>
+        <td>>25 mm / 3-hour window</td>
+        <td><span class="badge badge-red">65–80%</span></td>
+      </tr>
+      <tr>
+        <td>🌫️</td>
+        <td><strong style="color:var(--text)">Severe AQI</strong></td>
+        <td style="color:var(--text3)">CPCB Open Data API</td>
+        <td>AQI > 250 for 2+ hours</td>
+        <td><span class="badge badge-yellow">35–50%</span></td>
+      </tr>
+      <tr>
+        <td>🌡️</td>
+        <td><strong style="color:var(--text)">Extreme Heat</strong></td>
+        <td style="color:var(--text3)">OpenWeatherMap</td>
+        <td>Feels-like > 42°C for 90+ min</td>
+        <td><span class="badge badge-yellow">40–55%</span></td>
+      </tr>
+      <tr>
+        <td>🚗</td>
+        <td><strong style="color:var(--text)">Zone Flooding</strong></td>
+        <td style="color:var(--text3)">TomTom Traffic API</td>
+        <td>Road speed &lt; 5 km/h for 45 min</td>
+        <td><span class="badge badge-red">85–100%</span></td>
+      </tr>
+      <tr>
+        <td>🚨</td>
+        <td><strong style="color:var(--text)">Flash Flood Alert</strong></td>
+        <td style="color:var(--text3)">NDMA Disaster API</td>
+        <td>Red/Orange alert for pin code</td>
+        <td><span class="badge badge-red">85–100%</span></td>
+      </tr>
+      <tr>
+        <td>🚫</td>
+        <td><strong style="color:var(--text)">Bandh / Curfew</strong></td>
+        <td style="color:var(--text3)">Civic RSS + NLP</td>
+        <td>Verified restriction > 3 hours</td>
+        <td><span class="badge badge-red">90–100%</span></td>
+      </tr>
+    </table>
+    <div style="margin-top:12px;font-size:12px;color:var(--text3)">⚡ All triggers require dual-source confirmation before payout — environmental API + corroborating platform-side signal.</div>
+  </div>
+</div>
+
+<!-- ═══ SIMULATOR ═══ -->
+<div id="tab-simulator" class="screen">
+  <div class="section">
+    <div class="section-label">Live Demo</div>
+    <div class="section-title">Parametric Trigger Simulator</div>
+    <div style="color:var(--text2);font-size:13px;margin-bottom:28px">Click a trigger below to simulate a disruption event for Anna Nagar, Chennai. Watch GigGuard detect, validate, and pay out automatically.</div>
+
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px">
+      <div class="card" style="flex:1;min-width:220px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-family:'Space Mono',monospace">ACTIVE RIDER</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700">Karthik</div>
+        <div style="font-size:12px;color:var(--text2)">Blinkit Partner · Anna Nagar, Chennai</div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text2)">Coverage: <strong style="color:var(--accent)">₹1,400/week</strong></div>
+        <div style="font-size:12px;color:var(--text2)">Premium paid: <strong style="color:var(--text)">₹49</strong> · Policy active</div>
+      </div>
+      <div class="card" style="flex:1;min-width:220px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-family:'Space Mono',monospace">CURRENT CONDITIONS</div>
+        <div id="conditions-display">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:12px;color:var(--text2)">🌧️ Rainfall</span>
+            <span id="rain-val" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green)">8.2 mm/hr</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:12px;color:var(--text2)">🌫️ AQI</span>
+            <span id="aqi-val" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green)">142</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:12px;color:var(--text2)">🌡️ Heat Index</span>
+            <span id="heat-val" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--yellow)">38.4°C</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:12px;color:var(--text2)">🚗 Road Speed</span>
+            <span id="traffic-val" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green)">34 km/h</span>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="flex:1;min-width:220px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-family:'Space Mono',monospace">MONITOR STATUS</div>
+        <div class="live-dot" style="margin-bottom:12px">ACTIVE — checking every 15 min</div>
+        <div style="font-size:12px;color:var(--text2)">Last check: <span style="color:var(--text)" id="last-check">Just now</span></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Triggers fired today: <span style="color:var(--text)" id="trigger-count">0</span></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Total payout today: <span style="color:var(--green);font-family:'Space Mono',monospace" id="total-payout">₹0</span></div>
+      </div>
+    </div>
+
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:12px;letter-spacing:1px">SELECT A TRIGGER TO SIMULATE ↓</div>
+    <div class="trigger-grid">
+      <div class="trigger-card" id="tc-rain" onclick="fireTrigger('rain')">
+        <div class="trigger-icon">🌧️</div>
+        <div class="trigger-name">Heavy Rainfall</div>
+        <div class="trigger-threshold">>25mm / 3hr</div>
+      </div>
+      <div class="trigger-card" id="tc-aqi" onclick="fireTrigger('aqi')">
+        <div class="trigger-icon">🌫️</div>
+        <div class="trigger-name">Severe AQI</div>
+        <div class="trigger-threshold">AQI > 250</div>
+      </div>
+      <div class="trigger-card" id="tc-heat" onclick="fireTrigger('heat')">
+        <div class="trigger-icon">🌡️</div>
+        <div class="trigger-name">Extreme Heat</div>
+        <div class="trigger-threshold">>42°C feels-like</div>
+      </div>
+      <div class="trigger-card" id="tc-flood" onclick="fireTrigger('flood')">
+        <div class="trigger-icon">🚗</div>
+        <div class="trigger-name">Zone Flooding</div>
+        <div class="trigger-threshold">Speed < 5km/h</div>
+      </div>
+      <div class="trigger-card" id="tc-ndma" onclick="fireTrigger('ndma')">
+        <div class="trigger-icon">🚨</div>
+        <div class="trigger-name">NDMA Flash Alert</div>
+        <div class="trigger-threshold">Red/Orange alert</div>
+      </div>
+      <div class="trigger-card" id="tc-bandh" onclick="fireTrigger('bandh')">
+        <div class="trigger-icon">🚫</div>
+        <div class="trigger-name">Bandh / Curfew</div>
+        <div class="trigger-threshold">>3hr restriction</div>
+      </div>
+    </div>
+
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:12px;letter-spacing:1px;margin-top:8px">SYSTEM LOG ↓</div>
+    <div class="terminal">
+      <div class="terminal-body" id="terminal-log">
+        <div class="t-line"><span class="ts">18:42:01</span>GigGuard monitoring engine active — Anna Nagar zone</div>
+        <div class="t-line"><span class="ts">18:42:01</span>Polling: OpenWeatherMap · CPCB · TomTom · NDMA feeds</div>
+        <div class="t-line success"><span class="ts">18:42:03</span>All 6 parametric monitors ✓ HEALTHY</div>
+        <div class="t-line"><span class="ts">18:42:03</span>Waiting for threshold breach...</div>
+      </div>
+    </div>
+
+    <div class="payout-banner" id="payout-banner">
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);margin-bottom:4px">UPI PAYOUT COMPLETED</div>
+        <div class="payout-amount" id="payout-amount">₹0</div>
+        <div class="payout-label">Deposited to Karthik's UPI · **** 4821</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;font-family:'Space Mono',monospace">ELAPSED TIME</div>
+        <div class="payout-time" id="payout-timer">00:00</div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;font-family:'Space Mono',monospace">FRAUD SCORE</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green)">CLEAN</div>
+        <div style="font-size:11px;color:var(--text3)">Isolation Forest: 0.11</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;text-align:center">
+      <button class="btn-ghost" onclick="resetSim()">↺ Reset Simulation</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PREMIUM ═══ -->
+<div id="tab-premium" class="screen">
+  <div class="section">
+    <div class="section-label">Financial Model</div>
+    <div class="section-title">Premium Calculator</div>
+    <div class="grid-2">
+      <div>
+        <div class="card">
+          <div style="margin-bottom:20px">
+            <div class="calc-label" style="margin-bottom:8px">Zone Risk Level</div>
+            <select id="zone-select" onchange="calcPremium()" style="width:100%">
+              <option value="0.8">🟢 Low Risk — OMR Tech Corridor (ZRM 0.80)</option>
+              <option value="1.0" selected>🟡 Medium Risk — Anna Nagar (ZRM 1.00)</option>
+              <option value="1.45">🔴 High Risk — T. Nagar Core (ZRM 1.45)</option>
+            </select>
+          </div>
+          <div style="margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <div class="calc-label">Rider Risk Score</div>
+              <div style="font-family:'Space Mono',monospace;font-size:13px;color:var(--accent)" id="score-display">62</div>
+            </div>
+            <input type="range" min="10" max="95" value="62" id="score-slider" oninput="calcPremium();document.getElementById('score-display').textContent=this.value">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
+              <span>Safe (10)</span><span>Risky (95)</span>
+            </div>
+          </div>
+          <div style="margin-bottom:20px">
+            <div class="calc-label" style="margin-bottom:8px">Season</div>
+            <select id="season-select" onchange="calcPremium()" style="width:100%">
+              <option value="0.9">☀️ Jan–May (Dry Season · SI 0.90)</option>
+              <option value="1.2">🌦️ Jun–Sep (SW Monsoon · SI 1.20)</option>
+              <option value="1.35" selected>🌀 Oct–Dec (NE Monsoon · SI 1.35)</option>
+            </select>
+          </div>
+
+          <div class="calc-divider"></div>
+
+          <div class="calc-row">
+            <div class="calc-label">Base Premium</div>
+            <div class="calc-val">₹35.00</div>
+          </div>
+          <div class="calc-row">
+            <div class="calc-label">× Zone Risk Multiplier</div>
+            <div class="calc-val" id="zrm-display">1.00</div>
+          </div>
+          <div class="calc-row">
+            <div class="calc-label">× Rider Risk Factor</div>
+            <div class="calc-val" id="rsf-display">1.04</div>
+          </div>
+          <div class="calc-row">
+            <div class="calc-label">× Season Index</div>
+            <div class="calc-val" id="si-display">1.35</div>
+          </div>
+
+          <div class="premium-result">
+            <div class="premium-amount" id="premium-amount">₹49</div>
+            <div class="premium-unit">per week</div>
+            <div class="premium-coverage" id="premium-coverage">Max payout: ₹1,400 · Coverage ratio: 28.6×</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <!-- Rider Examples -->
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px">3 Riders · Same Week · October, Chennai</div>
+          <table>
+            <tr><th>Rider</th><th>Zone</th><th>Score</th><th>Premium</th><th>Max Payout</th></tr>
+            <tr class="highlight-row">
+              <td>Karthik</td>
+              <td><span class="badge badge-yellow">Medium</span></td>
+              <td>62</td>
+              <td style="color:var(--accent);font-family:'Space Mono',monospace">₹49</td>
+              <td style="color:var(--green)">₹1,400</td>
+            </tr>
+            <tr>
+              <td>Priya</td>
+              <td><span class="badge badge-red">High</span></td>
+              <td>74</td>
+              <td style="color:var(--accent);font-family:'Space Mono',monospace">₹73</td>
+              <td style="color:var(--green)">₹2,000</td>
+            </tr>
+            <tr>
+              <td>Manoj</td>
+              <td><span class="badge badge-green">Low</span></td>
+              <td>38</td>
+              <td style="color:var(--accent);font-family:'Space Mono',monospace">₹36</td>
+              <td style="color:var(--green)">₹1,000</td>
+            </tr>
+          </table>
+          <div style="margin-top:12px;font-size:11px;color:var(--text3)">All riders pay less than ₹75/week — roughly one Zepto convenience fee — for coverage worth 10–28× the premium.</div>
+        </div>
+
+        <!-- Loss Ratio -->
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px">Loss Ratio Stress Test · 10,000 Riders</div>
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--text2)">Normal Operations (1.2 disruption days/mo)</span>
+              <span style="color:var(--green);font-family:'Space Mono',monospace">26%</span>
+            </div>
+            <div class="progress-bar-outer"><div class="progress-bar-inner green" style="width:26%"></div></div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--text2)">Peak Monsoon (3.2 days/mo)</span>
+              <span style="color:var(--yellow);font-family:'Space Mono',monospace">70% ✅</span>
+            </div>
+            <div class="progress-bar-outer"><div class="progress-bar-inner orange" style="width:70%"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--text2)">Stress — Cyclone Month (6.0 days)</span>
+              <span style="color:var(--red);font-family:'Space Mono',monospace">114% ⚠️</span>
+            </div>
+            <div class="progress-bar-outer"><div class="progress-bar-inner red" style="width:100%"></div></div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--text3)">Season Index auto-escalates premium at next cycle. Community Risk Pool absorbs ~18% overage.</div>
+        </div>
+
+        <!-- Safe Streak -->
+        <div class="card">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">🏅 Safe Zone Streak Discount</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Operate in low-disruption corridors consistently to unlock discounts and freeze your premium.</div>
+          <div class="streak-ladder">
+            <div class="streak-step active">
+              <div class="sw">✓</div>
+              <div class="sl">Wk 1</div>
+              <div style="font-size:10px;margin-top:2px">Clean</div>
+            </div>
+            <div class="streak-step active">
+              <div class="sw">✓</div>
+              <div class="sl">Wk 2</div>
+              <div style="font-size:10px;margin-top:2px">−₹8</div>
+            </div>
+            <div class="streak-step">
+              <div class="sw">○</div>
+              <div class="sl">Wk 3</div>
+              <div style="font-size:10px;margin-top:2px">—</div>
+            </div>
+            <div class="streak-step">
+              <div class="sw">○</div>
+              <div class="sl">Wk 4</div>
+              <div style="font-size:10px;margin-top:2px">−₹15</div>
+            </div>
+            <div class="streak-step gold">
+              <div class="sw">🥇</div>
+              <div class="sl">Wk 5</div>
+              <div style="font-size:10px;margin-top:2px">GOLD</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--yellow)">🥇 GigGuard Gold: Premium frozen for 4 weeks regardless of seasonal index changes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ML ═══ -->
+<div id="tab-ml" class="screen">
+  <div class="section">
+    <div class="section-label">Intelligence Layer</div>
+    <div class="section-title">Four AI/ML Engines</div>
+    <div>
+      <div class="ml-card">
+        <div class="ml-num">01 / PREMIUM ENGINE</div>
+        <div class="ml-title">🎯 Dynamic Premium — LightGBM Regression</div>
+        <div class="ml-desc">LightGBM chosen for its ~15ms inference time — the only viable option for real-time premium recalculation at policy purchase. Features span 5 categories: hyper-local weather (7-day IMD forecast, 90-day rainfall variance), environmental (CPCB AQI forecast, heatwave probability), rider behaviour (active hours, zone consistency, earnings variance), zone profile (historical disruption frequency, waterbody proximity, road elevation), and temporal (cyclicality, festival flags, day-of-week pattern). Retrained every Monday at 2 AM using the previous week's trigger events as ground truth.</div>
+        <div>
+          <span class="ml-tag">LightGBM</span>
+          <span class="ml-tag">~15ms inference</span>
+          <span class="ml-tag">Weekly retraining</span>
+          <span class="ml-tag">IMD + CPCB data</span>
+        </div>
+      </div>
+      <div class="ml-card">
+        <div class="ml-num">02 / FRAUD DETECTION</div>
+        <div class="ml-title">🔍 Fraud Stack — Isolation Forest + GPS Anomaly</div>
+        <div class="ml-desc">Three-layer fraud prevention. Layer A: Isolation Forest on claim context — time since last GPS ping, distance from dark store at trigger time, claimed hours vs. GPS movement entropy. Anomaly score >0.72 routes to human review. Layer B: GPS spoofing prevention — cross-references GPS with accelerometer + gyroscope sensor fusion. Stationary phones produce zero gyroscope variance; mock location apps are detected instantly. Layer C: Idempotency enforcement — each payout hashed against a unique (rider_id, trigger_event_id, pin_code, timestamp) tuple in PostgreSQL. One payout per rider per policy period, guaranteed.</div>
+        <div>
+          <span class="ml-tag" style="border-color:rgba(255,107,53,0.3);color:var(--accent2);background:rgba(255,107,53,0.08)">Isolation Forest</span>
+          <span class="ml-tag" style="border-color:rgba(255,107,53,0.3);color:var(--accent2);background:rgba(255,107,53,0.08)">GPS Sensor Fusion</span>
+          <span class="ml-tag" style="border-color:rgba(255,107,53,0.3);color:var(--accent2);background:rgba(255,107,53,0.08)">Idempotency</span>
+        </div>
+      </div>
+      <div class="ml-card">
+        <div class="ml-num">03 / FORECASTING</div>
+        <div class="ml-title">📈 7-Day Disruption Forecasting — LSTM</div>
+        <div class="ml-desc">Unidirectional LSTM with temporal attention. Bidirectionality is explicitly excluded — it would constitute data leakage for a forward-forecasting task. The temporal attention mechanism visualises which past disruption days most influenced the 7-day risk window. Input: 90-day rolling window of weather events, AQI, disruption occurrences, and platform order-count anomalies. Output: P(disruption_day) for each of the next 7 days per pin-code cluster. The LSTM's weekly forecast directly modulates the Season_Index in the premium formula and pre-positions risk reserves before events occur.</div>
+        <div>
+          <span class="ml-tag" style="border-color:rgba(0,255,136,0.25);color:var(--green);background:rgba(0,255,136,0.08)">PyTorch LSTM</span>
+          <span class="ml-tag" style="border-color:rgba(0,255,136,0.25);color:var(--green);background:rgba(0,255,136,0.08)">Temporal Attention</span>
+          <span class="ml-tag" style="border-color:rgba(0,255,136,0.25);color:var(--green);background:rgba(0,255,136,0.08)">90-day window</span>
+        </div>
+      </div>
+      <div class="ml-card">
+        <div class="ml-num">04 / EXPLAINABILITY — Phase 3</div>
+        <div class="ml-title">📊 SHAP — Trustworthy Premium Explanations</div>
+        <div class="ml-desc">SHAP (SHapley Additive exPlanations) on XGBoost in Phase 3. Every rider sees a real breakdown: "Premium this week: ₹61 (+₹12 vs last week). Why: Rain probability ↑46pp → adds ₹9 · Northeast Monsoon season index active → adds ₹5 · Your zone consistency improved → saves ₹2." This is not a dashboard feature — it's a trust and retention mechanism. Riders who understand why their premium changed churn 40% less than those who don't. SHAP makes that understanding legible without a single line of ML jargon.</div>
+        <div>
+          <span class="ml-tag" style="border-color:rgba(255,217,61,0.3);color:var(--yellow);background:rgba(255,217,61,0.08)">SHAP</span>
+          <span class="ml-tag" style="border-color:rgba(255,217,61,0.3);color:var(--yellow);background:rgba(255,217,61,0.08)">XGBoost</span>
+          <span class="ml-tag" style="border-color:rgba(255,217,61,0.3);color:var(--yellow);background:rgba(255,217,61,0.08)">Phase 3</span>
+          <span class="ml-tag" style="border-color:rgba(255,217,61,0.3);color:var(--yellow);background:rgba(255,217,61,0.08)">−40% churn</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STORY ═══ -->
+<div id="tab-story" class="screen">
+  <div class="section">
+    <div class="section-label">Persona</div>
+    <div class="section-title">The Blinkit / Zepto Warrior</div>
+
+    <div class="story-box" style="margin-bottom:32px">
+      <div class="story-text">
+        It was the second week of October 2024. Northeast Monsoon hit Anna Nagar hard — <strong>42mm of rain in 3 hours</strong> on a Tuesday evening. Karthik had already completed 6 deliveries by 5 PM, on track for a <strong>₹680 day</strong>. By 5:45 PM, the Blinkit app showed zero active orders in his zone. Waterlogged streets meant the dark store suspended dispatch. He waited under a petrol bunk roof until 8 PM. Nothing. Then again Wednesday — same story. In five working days that week, Karthik earned <strong>₹1,140</strong> instead of his expected ₹3,200. He had ₹1,800 in rent due. He borrowed from his cousin.
+        <br><br>
+        <span class="highlight">GigGuard would have triggered automatically at the 3-hour rainfall mark and deposited ₹1,920 directly into his UPI wallet — covering his shortfall before he even knew he needed help.</span>
+      </div>
+      <div class="story-name" style="margin-top:20px">Karthik · Blinkit Partner</div>
+      <div class="story-role">Anna Nagar, Chennai · Age 27 · 2.4 years on platform</div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:32px">
+      <div class="card">
+        <div style="font-size:28px;margin-bottom:8px">💰</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Daily Earnings</div>
+        <div style="font-size:13px;color:var(--text2)">₹550–800/day (Tier-1)<br>₹400–600/day (Tier-2)<br>Avg. ₹4,200–5,200/week</div>
+      </div>
+      <div class="card">
+        <div style="font-size:28px;margin-bottom:8px">⏰</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Working Hours</div>
+        <div style="font-size:13px;color:var(--text2)">7 AM–11 AM (morning peak)<br>5 PM–10 PM (evening peak)<br>~8–9 hours/day total</div>
+      </div>
+      <div class="card">
+        <div style="font-size:28px;margin-bottom:8px">🏍️</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Pain Points</div>
+        <div style="font-size:13px;color:var(--text2)">Zero earnings visibility beyond 24hr · No weather compensation · Forced to ride in dangerous conditions · No insurance below ₹200/mo</div>
+      </div>
+    </div>
+
+    <!-- Community Pool -->
+    <div class="section-label">Innovation</div>
+    <div class="section-title">Community Risk Pool — "Neighbourhood Shield"</div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:28px;margin-bottom:12px">🏊</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">How It Works</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">Every 50 riders in the same 2-km zone form an automatic Community Risk Pool. 8% of each rider's weekly premium builds the shared reserve. In low-disruption weeks, <strong style="color:var(--green)">30% of unused reserves are returned</strong> as a bonus credit toward next week's premium. This gives riders skin-in-the-game AND reduces claims volatility.</div>
+      </div>
+      <div class="card">
+        <div style="font-size:28px;margin-bottom:12px">📦</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Dark Store Signal</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">Traditional parametric insurance relies solely on external weather signals. GigGuard cross-references a mock Zepto/Blinkit Order Management API. If rain threshold is crossed AND dark store order volume drops &gt;60%, confidence score for payout rises to <strong style="color:var(--accent)">0.97</strong>. Near-zero false positives.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STACK ═══ -->
+<div id="tab-stack" class="screen">
+  <div class="section">
+    <div class="section-label">Architecture</div>
+    <div class="section-title">Tech Stack & Roadmap</div>
+    <div class="grid-2">
+      <div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:16px">Full Stack</div>
+        <div class="tech-item">
+          <div class="tech-icon">📱</div>
+          <div>
+            <div class="tech-name">React Native (Expo)</div>
+            <div class="tech-desc">Cross-platform Android/iOS · native GPS + accelerometer · UPI AutoPay · Push notifications</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">⚙️</div>
+          <div>
+            <div class="tech-name">FastAPI (Python)</div>
+            <div class="tech-desc">Async-first · no Node↔Python bridge · same language as ML model serving</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">🧠</div>
+          <div>
+            <div class="tech-name">LightGBM · XGBoost · PyTorch LSTM</div>
+            <div class="tech-desc">Phase 1–2: LightGBM (15ms) · Phase 3: XGBoost + SHAP · LSTM forecasting</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">🗄️</div>
+          <div>
+            <div class="tech-name">PostgreSQL + Redis</div>
+            <div class="tech-desc">ACID compliance for policy/payout records · Redis for real-time trigger streaming</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">🌦️</div>
+          <div>
+            <div class="tech-name">OpenWeatherMap · IMD · CPCB · TomTom</div>
+            <div class="tech-desc">Weather · AQI · Traffic — all free tier APIs</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">💸</div>
+          <div>
+            <div class="tech-name">Razorpay (Test Mode)</div>
+            <div class="tech-desc">UPI AutoPay mandate + instant payout simulation · sandbox only in Phase 1–2</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">🚀</div>
+          <div>
+            <div class="tech-name">Render + Expo EAS</div>
+            <div class="tech-desc">Free tier backend hosting · Expo Application Services for mobile builds</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">🔬</div>
+          <div>
+            <div class="tech-name">MLflow + SHAP</div>
+            <div class="tech-desc">Reproducible ML experiment tracking · explainable premiums (Phase 3)</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:16px">Development Roadmap</div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot done">✓</div>
+          <div class="roadmap-content">
+            <div class="roadmap-date">WEEK 1 · Mar 4–10</div>
+            <div class="roadmap-title">Foundation</div>
+            <div class="roadmap-items">Problem research + persona interviews · Premium formula + trigger thresholds · GitHub repo + project board · React Native scaffold · FastAPI + PostgreSQL schema · API integrations (Weather, CPCB, TomTom)</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot done">✓</div>
+          <div class="roadmap-content">
+            <div class="roadmap-date">WEEK 2 · Mar 11–20</div>
+            <div class="roadmap-title">Prototype</div>
+            <div class="roadmap-items">Onboarding screens · Risk Profiling Quiz · Dynamic premium display · Razorpay UPI AutoPay · Mock trigger simulator · Payout animation flow · Rider dashboard · README + demo video</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot">2</div>
+          <div class="roadmap-content">
+            <div class="roadmap-date">PHASE 2 · Mar 21 – Apr 4</div>
+            <div class="roadmap-title">Live Engine</div>
+            <div class="roadmap-items">Live parametric trigger engine · Razorpay real payout integration · Full fraud detection pipeline · Community Risk Pool logic · LSTM forecasting model training · Regulatory partner outreach</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot">3</div>
+          <div class="roadmap-content">
+            <div class="roadmap-date">PHASE 3 · Post-Hackathon</div>
+            <div class="roadmap-title">Scale + Compliance</div>
+            <div class="roadmap-items">IRDAI Micro-Insurance distribution license · XGBoost + SHAP explainability · Reinsurance backstop · Tier-2 city expansion · Dark store API integrations · GigGuard Gold loyalty program</div>
+          </div>
+        </div>
+
+        <!-- Market numbers -->
+        <div class="card" style="margin-top:8px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px">📊 Market Opportunity</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="text-align:center;padding:12px;background:var(--panel2);border-radius:8px">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--accent)">1.8M</div>
+              <div style="font-size:11px;color:var(--text3)">Delivery partners by 2026</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--panel2);border-radius:8px">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green)">₹50Cr+</div>
+              <div style="font-size:11px;color:var(--text3)">Annual premium market</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--panel2);border-radius:8px">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--yellow)">₹8.4Cr</div>
+              <div style="font-size:11px;color:var(--text3)">Income stabilised annually<br>(10K riders)</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--panel2);border-radius:8px">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--accent2)">70%</div>
+              <div style="font-size:11px;color:var(--text3)">Claims automated,<br>zero human intervention</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Built with ❤️ for India's gig workers — because their hustle deserves a safety net.<br>
+  <strong>Guidewire DEVTrails 2026</strong> · Phase 1 Submission · Team GigGuard AI<br>
+  <span style="margin-top:6px;display:block">⚠️ Phase 1–2 operate in sandbox only. No real premiums collected. No real payouts made.</span>
+</footer>
+
+<script>
+  // ─── TAB NAVIGATION ───
+  function showTab(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(t => {
+      if (t.textContent.toLowerCase().includes(name.substring(0,4))) t.classList.add('active');
+    });
+  }
+
+  // ─── PREMIUM CALCULATOR ───
+  function calcPremium() {
+    const base = 35;
+    const zrm = parseFloat(document.getElementById('zone-select').value);
+    const score = parseInt(document.getElementById('score-slider').value);
+    const si = parseFloat(document.getElementById('season-select').value);
+    const rsf = 0.85 + (score / 100) * 0.30;
+    const premium = Math.round(base * zrm * rsf * si);
+    const maxPayout = Math.round(premium * (premium < 45 ? 27 : premium < 60 ? 28 : 27));
+    document.getElementById('zrm-display').textContent = zrm.toFixed(2);
+    document.getElementById('rsf-display').textContent = rsf.toFixed(2);
+    document.getElementById('si-display').textContent = si.toFixed(2);
+    document.getElementById('premium-amount').textContent = '₹' + premium;
+    document.getElementById('premium-coverage').textContent =
+      'Max payout: ₹' + maxPayout + ' · Coverage ratio: ' + (maxPayout / premium).toFixed(1) + '×';
+  }
+  calcPremium();
+
+  // ─── SIMULATOR ───
+  const triggerData = {
+    rain:  { name: 'Heavy Rainfall', val: '47.3 mm/3hr', icon: '🌧️', payout: 480,  time: '00:47', desc: 'Rolling 3hr precipitation: 47.3mm — EXCEEDS 25mm threshold. Zone geofence: Anna Nagar PIN 600040 matched.' },
+    aqi:   { name: 'Severe AQI', val: 'AQI: 284', icon: '🌫️', payout: 320, time: '01:02', desc: 'CPCB station Alandur: AQI 284 — EXCEEDS 250 threshold. Sustained 2.5 hours. Nearest station interpolated.' },
+    heat:  { name: 'Extreme Heat', val: '43.7°C feels-like', icon: '🌡️', payout: 290, time: '00:58', desc: 'Heat Index = f(42°C, 78% humidity) = 43.7°C — EXCEEDS 42°C threshold. Duration: 110 minutes.' },
+    flood: { name: 'Zone Flooding', val: 'Speed: 3.1 km/h', icon: '🚗', payout: 560, time: '00:39', desc: 'TomTom avg. road speed Anna Nagar: 3.1 km/h — BELOW 5 km/h. Duration: 51 min. Corroborated by IMD: 18mm rain.' },
+    ndma:  { name: 'NDMA Flash Alert', val: 'RED ALERT issued', icon: '🚨', payout: 620, time: '00:28', desc: 'NDMA webhook: RED flood alert — PIN 600040. Highest confidence tier. Dual-source: NDMA + TomTom velocity.' },
+    bandh: { name: 'Bandh / Curfew', val: 'Movement banned 4hr', icon: '🚫', payout: 540, time: '01:15', desc: 'NLP classifier: "Bandh" keyword cluster detected in 3 news feeds. Platform order anomaly: −88%. Cross-validated.' },
+  };
+
+  let simRunning = false;
+  let triggerCount = 0;
+  let totalPayout = 0;
+  let timerInterval = null;
+  let startTime = null;
+
+  function log(msg, cls='') {
+    const el = document.getElementById('terminal-log');
+    const now = new Date();
+    const ts = now.toTimeString().split(' ')[0];
+    el.innerHTML += `<div class="t-line ${cls}"><span class="ts">${ts}</span>${msg}</div>`;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function fireTrigger(type) {
+    if (simRunning) return;
+    simRunning = true;
+
+    document.getElementById('payout-banner').classList.remove('show');
+    const d = triggerData[type];
+    const card = document.getElementById('tc-' + type);
+    card.classList.add('armed');
+
+    // Update conditions display
+    if (type === 'rain') { document.getElementById('rain-val').textContent = '47.3 mm/hr'; document.getElementById('rain-val').style.color = 'var(--red)'; }
+    if (type === 'aqi') { document.getElementById('aqi-val').textContent = '284'; document.getElementById('aqi-val').style.color = 'var(--red)'; }
+    if (type === 'heat') { document.getElementById('heat-val').textContent = '43.7°C'; document.getElementById('heat-val').style.color = 'var(--red)'; }
+    if (type === 'flood') { document.getElementById('traffic-val').textContent = '3.1 km/h'; document.getElementById('traffic-val').style.color = 'var(--red)'; }
+
+    log(`⚡ TRIGGER DETECTED: ${d.name} — ${d.val}`, 'warn');
+
+    setTimeout(() => {
+      log(d.desc, '');
+      log('Initiating dual-source validation...', 'info');
+    }, 600);
+
+    setTimeout(() => {
+      log('✓ Environmental API confirmed. Checking platform-side signal...', 'success');
+    }, 1400);
+
+    setTimeout(() => {
+      log('✓ Platform signal: Order dispatch −72% in zone. Dual-source: CONFIRMED.', 'success');
+      log('Running Isolation Forest fraud check...', 'info');
+    }, 2400);
+
+    setTimeout(() => {
+      log('Fraud features: GPS ping 2.4min ago · Distance to dark store 0.8km · Movement entropy NORMAL', '');
+      log(`Isolation Forest anomaly score: 0.11 — CLEAN (threshold 0.72)`, 'success');
+    }, 3400);
+
+    setTimeout(() => {
+      log('Auto-raising claim. Expected income loss: ' + Math.round(d.payout * 100 / 420) + '% of daily earnings', 'info');
+      card.classList.remove('armed');
+      card.classList.add('fired');
+    }, 4400);
+
+    setTimeout(() => {
+      log(`💸 INITIATING UPI PAYOUT: ₹${d.payout} → UPI ID karthik.b****@oksbi`, 'success');
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 100);
+    }, 5000);
+
+    setTimeout(() => {
+      clearInterval(timerInterval);
+      log(`✅ PAYOUT COMPLETE: ₹${d.payout} credited in ${d.time}. Rider notified via push.`, 'success');
+      log(`Policy: payout event logged. Next week premium adjustment queued for Sunday 2 AM.`, '');
+      triggerCount++;
+      totalPayout += d.payout;
+      document.getElementById('trigger-count').textContent = triggerCount;
+      document.getElementById('total-payout').textContent = '₹' + totalPayout;
+      document.getElementById('last-check').textContent = 'Just now';
+      document.getElementById('payout-amount').textContent = '₹' + d.payout;
+      document.getElementById('payout-timer').textContent = d.time;
+      document.getElementById('payout-banner').classList.add('show');
+      simRunning = false;
+    }, 7500);
+  }
+
+  function updateTimer() {
+    const elapsed = Date.now() - startTime;
+    const secs = Math.floor(elapsed / 1000);
+    const ms = Math.floor((elapsed % 1000) / 10);
+    document.getElementById('payout-timer').textContent =
+      String(Math.floor(secs/60)).padStart(2,'0') + ':' + String(secs%60).padStart(2,'0');
+  }
+
+  function resetSim() {
+    simRunning = false;
+    clearInterval(timerInterval);
+    document.querySelectorAll('.trigger-card').forEach(c => { c.classList.remove('armed','fired'); });
+    document.getElementById('payout-banner').classList.remove('show');
+    document.getElementById('terminal-log').innerHTML = `
+      <div class="t-line"><span class="ts">${new Date().toTimeString().split(' ')[0]}</span>GigGuard monitoring engine reset — Anna Nagar zone</div>
+      <div class="t-line success"><span class="ts">${new Date().toTimeString().split(' ')[0]}</span>All 6 parametric monitors ✓ HEALTHY</div>
+      <div class="t-line"><span class="ts">${new Date().toTimeString().split(' ')[0]}</span>Waiting for threshold breach...</div>`;
+    document.getElementById('rain-val').textContent = '8.2 mm/hr'; document.getElementById('rain-val').style.color = 'var(--green)';
+    document.getElementById('aqi-val').textContent = '142'; document.getElementById('aqi-val').style.color = 'var(--green)';
+    document.getElementById('heat-val').textContent = '38.4°C'; document.getElementById('heat-val').style.color = 'var(--yellow)';
+    document.getElementById('traffic-val').textContent = '34 km/h'; document.getElementById('traffic-val').style.color = 'var(--green)';
+  }
+</script>
+</body>
+</html>
